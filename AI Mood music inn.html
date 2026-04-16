@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Mood Music 🇮🇳</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #020617, #1e293b);
+    color: white;
+    text-align: center;
+}
+
+.container {
+    padding: 40px;
+}
+
+h1 {
+    font-size: 42px;
+}
+
+input {
+    padding: 12px;
+    width: 320px;
+    border-radius: 6px;
+    border: none;
+}
+
+button {
+    padding: 12px;
+    margin: 10px;
+    background: #f97316;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #ea580c;
+}
+
+#mood {
+    margin-top: 20px;
+    font-size: 24px;
+}
+
+#songs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    margin: 15px;
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 10px;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.footer {
+    margin-top: 30px;
+    font-size: 14px;
+    color: #94a3b8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎧 AI Mood Music 🇮🇳</h1>
+<p>Type or speak your mood (English supported 🎤)</p>
+
+<input id="text" placeholder="e.g. I feel super energetic today">
+<br>
+
+<button onclick="getSongs()">🎵 Recommend</button>
+<button onclick="voice()">🎤 Speak (English)</button>
+
+<div id="mood"></div>
+<div id="songs"></div>
+
+<div class="footer">AI Powered • Bollywood + Bhojpuri</div>
+
+</div>
+
+<script>
+
+// 🧠 AI-LIKE MOOD DETECTION (weighted scoring)
+function detectMood(text) {
+    text = text.toLowerCase();
+
+    let score = {
+        happy: 0,
+        sad: 0,
+        angry: 0,
+        romantic: 0,
+        energetic: 0,
+        relax: 0
+    };
+
+    // keyword weights
+    const keywords = {
+        happy: ["happy","great","awesome","excited","khush","mast"],
+        sad: ["sad","cry","lonely","dukhi","depressed"],
+        angry: ["angry","mad","gussa","frustrated"],
+        romantic: ["love","pyaar","romantic","ishq"],
+        energetic: ["energy","energetic","dance","party","josh","high"],
+        relax: ["calm","relax","chill","peace"]
+    };
+
+    // scoring
+    for (let mood in keywords) {
+        keywords[mood].forEach(word => {
+            if (text.includes(word)) {
+                score[mood] += 1;
+            }
+        });
+    }
+
+    // find best mood
+    let detected = "relax";
+    let max = 0;
+
+    for (let mood in score) {
+        if (score[mood] > max) {
+            max = score[mood];
+            detected = mood;
+        }
+    }
+
+    const messages = {
+        happy: "😊 Bollywood Happy Mood",
+        sad: "😢 Emotional Mood",
+        angry: "😤 Angry Mood",
+        romantic: "❤️ Romantic Mood",
+        energetic: "⚡ Bhojpuri Energy Mode",
+        relax: "😌 Relax Mood"
+    };
+
+    return [detected, messages[detected]];
+}
+
+// 🎵 PLAYLISTS
+const songs = {
+
+happy: [
+"https://open.spotify.com/embed/playlist/37i9dQZF1DX0XUfTFmNBRM"
+],
+
+sad: [
+"https://open.spotify.com/embed/playlist/37i9dQZF1DX7qK8ma5wgG1"
+],
+
+angry: [
+"https://open.spotify.com/embed/playlist/37i9dQZF1DX1lVhptIYRda"
+],
+
+romantic: [
+"https://open.spotify.com/embed/playlist/37i9dQZF1DWYztMONFqfvX"
+],
+
+relax: [
+"https://open.spotify.com/embed/playlist/37i9dQZF1DX3rxVfibe1L0"
+],
+
+energetic: [
+"https://open.spotify.com/embed/playlist/37i9dQZF1DWXtlo6ENS92N",
+"https://open.spotify.com/embed/playlist/0VhLtDUX7J7IrkMtRqFiD2",
+"https://open.spotify.com/embed/playlist/37i9dQZF1E4AnYVmEEo8ws"
+]
+
+};
+
+// 🎵 MAIN FUNCTION
+function getSongs() {
+
+    let text = document.getElementById("text").value;
+
+    if (!text) {
+        alert("Enter your mood 😄");
+        return;
+    }
+
+    let [mood, message] = detectMood(text);
+
+    document.getElementById("mood").innerHTML =
+    `<h2>${message}</h2><p>Detected Mood: <b>${mood.toUpperCase()}</b></p>`;
+
+    let songsDiv = document.getElementById("songs");
+    songsDiv.innerHTML = "";
+
+    songs[mood].forEach(link => {
+        songsDiv.innerHTML += `
+        <div class="card">
+            <iframe style="border-radius:12px"
+            src="${link}"
+            width="300" height="380"
+            frameBorder="0"
+            allow="autoplay; encrypted-media">
+            </iframe>
+        </div>`;
+    });
+}
+
+// 🎤 VOICE INPUT (ENGLISH ENABLED)
+function voice() {
+    let rec = new webkitSpeechRecognition();
+    rec.lang = "en-US"; // 🔥 English audio input
+    rec.onresult = e => {
+        document.getElementById("text").value = e.results[0][0].transcript;
+    };
+    rec.start();
+}
+
+</script>
+
+</body>
+</html>
